@@ -1,6 +1,6 @@
 'use strict';
 
-var traverse = module.exports = function (schema, opts, cb) {
+var traverse = module.exports = async function (schema, opts, cb) {
   // Legacy support for v0.3.1 and earlier.
   if (typeof opts == 'function') {
     cb = opts;
@@ -13,7 +13,7 @@ var traverse = module.exports = function (schema, opts, cb) {
   var post = cb.post || function () {
   };
 
-  _traverse(opts, pre, post, schema, '', schema);
+  await _traverse(opts, pre, post, schema, '', schema);
 };
 
 
@@ -74,15 +74,15 @@ async function _traverse(opts, pre, post, schema, jsonPtr, rootSchema, parentJso
       if (Array.isArray(sch)) {
         if (key in traverse.arrayKeywords) {
           for (var i = 0; i < sch.length; i++)
-            _traverse(opts, pre, post, sch[i], jsonPtr + '/' + key + '/' + i, rootSchema, jsonPtr, key, schema, i);
+            await _traverse(opts, pre, post, sch[i], jsonPtr + '/' + key + '/' + i, rootSchema, jsonPtr, key, schema, i);
         }
       } else if (key in traverse.propsKeywords) {
         if (sch && typeof sch == 'object') {
           for (var prop in sch)
-            _traverse(opts, pre, post, sch[prop], jsonPtr + '/' + key + '/' + escapeJsonPtr(prop), rootSchema, jsonPtr, key, schema, prop);
+            await _traverse(opts, pre, post, sch[prop], jsonPtr + '/' + key + '/' + escapeJsonPtr(prop), rootSchema, jsonPtr, key, schema, prop);
         }
       } else if (key in traverse.keywords || (opts.allKeys && !(key in traverse.skipKeywords))) {
-        _traverse(opts, pre, post, sch, jsonPtr + '/' + key, rootSchema, jsonPtr, key, schema);
+        await _traverse(opts, pre, post, sch, jsonPtr + '/' + key, rootSchema, jsonPtr, key, schema);
       }
     }
     await post(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
