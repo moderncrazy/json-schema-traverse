@@ -2,12 +2,12 @@ declare function traverse(
   schema: traverse.SchemaObject,
   opts: traverse.Options,
   cb?: traverse.Callback
-): void;
+): Promise<void>;
 
 declare function traverse(
   schema: traverse.SchemaObject,
   cb: traverse.Callback
-): void;
+): Promise<void>;
 
 declare namespace traverse {
   interface SchemaObject {
@@ -24,7 +24,7 @@ declare namespace traverse {
     parentKeyword?: string,
     parentSchema?: SchemaObject,
     keyIndex?: string | number
-  ) => void;
+  ) => Promise<void>;
 
   interface Options {
     allKeys?: boolean;

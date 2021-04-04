@@ -8,8 +8,10 @@ var traverse = module.exports = function (schema, opts, cb) {
   }
 
   cb = opts.cb || cb;
-  var pre = (typeof cb == 'function') ? cb : cb.pre || function() {};
-  var post = cb.post || function() {};
+  var pre = (typeof cb == 'function') ? cb : cb.pre || function () {
+  };
+  var post = cb.post || function () {
+  };
 
   _traverse(opts, pre, post, schema, '', schema);
 };
@@ -64,14 +66,14 @@ traverse.skipKeywords = {
 };
 
 
-function _traverse(opts, pre, post, schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex) {
+async function _traverse(opts, pre, post, schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex) {
   if (schema && typeof schema == 'object' && !Array.isArray(schema)) {
-    pre(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
+    await pre(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
     for (var key in schema) {
       var sch = schema[key];
       if (Array.isArray(sch)) {
         if (key in traverse.arrayKeywords) {
-          for (var i=0; i<sch.length; i++)
+          for (var i = 0; i < sch.length; i++)
             _traverse(opts, pre, post, sch[i], jsonPtr + '/' + key + '/' + i, rootSchema, jsonPtr, key, schema, i);
         }
       } else if (key in traverse.propsKeywords) {
@@ -83,7 +85,7 @@ function _traverse(opts, pre, post, schema, jsonPtr, rootSchema, parentJsonPtr, 
         _traverse(opts, pre, post, sch, jsonPtr + '/' + key, rootSchema, jsonPtr, key, schema);
       }
     }
-    post(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
+    await post(schema, jsonPtr, rootSchema, parentJsonPtr, parentKeyword, parentSchema, keyIndex);
   }
 }
 
